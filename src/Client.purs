@@ -1,7 +1,6 @@
 module Client where
 
 import Prelude
-
 import Data.Date (Date)
 import Data.DateTime (date)
 import Data.Either (Either(..))

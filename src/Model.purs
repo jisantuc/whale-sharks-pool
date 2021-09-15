@@ -37,11 +37,13 @@ data WinLoss
   | Loss
 
 instance decodeWinLoss :: DecodeJson WinLoss where
-  decodeJson js = note (UnexpectedValue js) $ toString js >>= (case _ of
-    "W" -> Just Win
-    "L" -> Just Loss
-    _ -> Nothing
-  )
+  decodeJson js =
+    note (UnexpectedValue js) $ toString js
+      >>= ( case _ of
+            "W" -> Just Win
+            "L" -> Just Loss
+            _ -> Nothing
+        )
 
 derive instance genericWinLoss :: Generic WinLoss _
 
@@ -53,11 +55,13 @@ data Game
   | NineBall
 
 instance decodeGame :: DecodeJson Game where
-  decodeJson js = note (UnexpectedValue js) $ toString js >>= (case _ of
-    "8 Ball" -> Just EightBall
-    "9 Ball" -> Just NineBall
-    _ -> Nothing
-  )
+  decodeJson js =
+    note (UnexpectedValue js) $ toString js
+      >>= ( case _ of
+            "8 Ball" -> Just EightBall
+            "9 Ball" -> Just NineBall
+            _ -> Nothing
+        )
 
 derive instance genericGame :: Generic Game _
 
@@ -86,7 +90,7 @@ instance decodeOrder :: DecodeJson Order where
             _ -> Nothing
         )
 
-derive instance genericOrder :: Generic Order _ 
+derive instance genericOrder :: Generic Order _
 
 instance showOrder :: Show Order where
   show = genericShow
@@ -128,11 +132,12 @@ jsonDateToString :: JsonDate -> String
 jsonDateToString (JsonDate dt) =
   let
     y = year dt
+
     m = month dt
+
     d = day dt
   in
     show y <> "-" <> show m <> "-" <> show d
-    
 
 instance decodeJsonDate :: DecodeJson JsonDate where
   decodeJson js = case toString js of
@@ -178,6 +183,8 @@ toXYData results =
   let
     xs :: Array String
     xs = (\(Result { date }) -> jsonDateToString date) <$> results
+
     ys :: Array Int
     ys = (\(Result { points }) -> points) <$> results
-  in { x: xs, y: ys }
+  in
+    { x: xs, y: ys }

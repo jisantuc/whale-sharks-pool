@@ -1,7 +1,6 @@
 module Main where
 
 import Prelude
-
 import Client (fetchResults)
 import Effect (Effect)
 import Effect.Aff (launchAff_)
@@ -17,7 +16,7 @@ import Effect.Class.Console (log, logShow)
 -- - put it all on S3
 main :: Effect Unit
 main = do
-  launchAff_ $ do
-    responses <- fetchResults "bogusKey"
-    logShow responses
-    
+  launchAff_
+    $ do
+        responses <- fetchResults "bogusKey"
+        logShow responses
