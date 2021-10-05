@@ -1,19 +1,32 @@
 module Model where
 
-import Data.Argonaut.Core (toObject, toString)
-import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..), (.:))
+import Data.Argonaut.Core (Json, fromString, toObject, toString)
+import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..), decodeJson, (.:))
+import Data.Argonaut.Encode (class EncodeJson, encodeJson)
+import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Bifunctor (lmap)
 import Data.Date (Date, day, month, year)
-import Data.DateTime (date)
+import Data.DateTime (DateTime(..), Hour, Millisecond, Minute, Second, Time(..), date)
 import Data.Either (Either(..), note)
-import Data.Formatter.DateTime (Formatter, FormatterCommand(..), unformat)
+import Data.Enum (toEnum)
+import Data.Formatter.DateTime (Formatter, FormatterCommand(..), format, unformat)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..), (:))
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromJust)
+import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
 import Data.String.NonEmpty (NonEmptyString)
+import Data.Traversable (traverse)
+import Partial.Unsafe (unsafePartial)
 import Plotly (XYData)
-import Prelude (bind, pure, show, ($), (<$>), (<<<), (<>), (>>=), class Show)
+import Prelude (class Show, bind, pure, show, ($), (<$>), (<<<), (<>), (>>=))
+
+newtype JsonBody a = JsonBody a
+
+derive instance Newtype (JsonBody a) _
+
+instance EncodeJson a => EncodeJson (JsonBody a) where
+  encodeJson (JsonBody serializable) = encodeJson serializable
 
 -- models for airtable response like:
 -- |
@@ -27,7 +40,7 @@ import Prelude (bind, pure, show, ($), (<$>), (<<<), (<>), (>>=), class Show)
 --         "Order": "2",
 --         "Points": 3,
 --         "Season Week": 2,
---         "Select": "W",
+--         "WinLoss": "W",
 --         "Session": "Fall 2021"
 --     },
 --     "id": "recxsfweFmHAgWeXi"
@@ -44,6 +57,10 @@ instance decodeWinLoss :: DecodeJson WinLoss where
             "L" -> Just Loss
             _ -> Nothing
         )
+
+instance EncodeJson WinLoss where
+  encodeJson Win = fromString "W"
+  encodeJson Loss = fromString "L"
 
 derive instance genericWinLoss :: Generic WinLoss _
 
@@ -62,6 +79,10 @@ instance decodeGame :: DecodeJson Game where
             "9 Ball" -> Just NineBall
             _ -> Nothing
         )
+
+instance EncodeJson Game where
+  encodeJson EightBall = fromString "8 Ball"
+  encodeJson NineBall = fromString "9 Ball"
 
 derive instance genericGame :: Generic Game _
 
@@ -90,6 +111,13 @@ instance decodeOrder :: DecodeJson Order where
             _ -> Nothing
         )
 
+instance EncodeJson Order where
+  encodeJson One = fromString "1"
+  encodeJson Two = fromString "2"
+  encodeJson Three = fromString "3"
+  encodeJson Four = fromString "4"
+  encodeJson Five = fromString "5"
+
 derive instance genericOrder :: Generic Order _
 
 instance showOrder :: Show Order where
@@ -105,6 +133,9 @@ instance decodeSession :: DecodeJson Session where
             "Fall 2021" -> pure Fall2021
             _ -> Nothing
         )
+
+instance EncodeJson Session where
+  encodeJson Fall2021 = fromString "Fall 2021"
 
 derive instance genericSession :: Generic Session _
 
@@ -144,6 +175,25 @@ instance decodeJsonDate :: DecodeJson JsonDate where
     Just dateString -> lmap (\s -> TypeMismatch ("String should match YYYY-MM-DD format: " <> s)) $ jsonDateFromString dateString
     Nothing -> Left $ UnexpectedValue js
 
+instance EncodeJson JsonDate where
+  encodeJson (JsonDate date) =
+    let
+      hour :: Partial => Hour
+      hour = fromJust (toEnum 0)
+
+      minute :: Partial => Minute
+      minute = fromJust (toEnum 0)
+
+      second :: Partial => Second
+      second = fromJust (toEnum 0)
+
+      millisecond :: Partial => Millisecond
+      millisecond = fromJust (toEnum 0)
+
+      midnight = unsafePartial $ Time hour minute second millisecond
+    in
+      fromString $ format dateFormat (DateTime date midnight)
+
 data Result
   = Result
     { date :: JsonDate
@@ -167,16 +217,35 @@ instance decodeResult :: DecodeJson Result where
       session <- fields .: "Session"
       order <- fields .: "Order"
       points <- fields .: "Points"
-      winLoss <- fields .: "Select"
+      winLoss <- fields .: "WinLoss"
       game <- fields .: "Game"
       seasonWeek <- fields .: "Season Week"
       pure $ Result { date, game, name, opponentSkill, order, points, seasonWeek, winLoss, session }
     Nothing -> Left $ UnexpectedValue js
 
+instance EncodeJson Result where
+  encodeJson = genericEncodeJson
+
 derive instance genericResult :: Generic Result _
 
 instance showResult :: Show Result where
   show = genericShow
+
+newtype Results = Results (Array Result)
+
+derive instance Newtype Results _
+
+derive newtype instance Show Results
+
+derive newtype instance EncodeJson Results
+
+instance DecodeJson Results where
+  decodeJson js = case toObject js of
+    Just obj -> do
+      records :: Array Json <- obj .: "records"
+      resultSet <- traverse decodeJson records
+      pure $ Results resultSet
+    Nothing -> Left $ UnexpectedValue js
 
 toXYData :: Array Result -> XYData String
 toXYData results =
