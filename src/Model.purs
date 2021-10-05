@@ -1,6 +1,6 @@
 module Model where
 
-import Data.Argonaut.Core (Json, fromString, stringify, toObject, toString)
+import Data.Argonaut.Core (Json, fromString, toObject, toString)
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..), decodeJson, (.:))
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
@@ -12,19 +12,14 @@ import Data.Enum (toEnum)
 import Data.Formatter.DateTime (Formatter, FormatterCommand(..), format, unformat)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..), (:))
-import Data.Map (fromFoldable)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
-import Data.String.CaseInsensitive (CaseInsensitiveString(..))
 import Data.String.NonEmpty (NonEmptyString)
 import Data.Traversable (traverse)
-import Data.Tuple (Tuple(..))
-import HTTPure.Body (class Body, defaultHeaders, write)
-import HTTPure.Headers (Headers(..))
 import Partial.Unsafe (unsafePartial)
 import Plotly (XYData)
-import Prelude (class Show, bind, pure, show, unit, ($), (<$>), (<<<), (<>), (>>=))
+import Prelude (class Show, bind, pure, show, ($), (<$>), (<<<), (<>), (>>=))
 
 newtype JsonBody a = JsonBody a
 
@@ -32,17 +27,6 @@ derive instance Newtype (JsonBody a) _
 
 instance EncodeJson a => EncodeJson (JsonBody a) where
   encodeJson (JsonBody serializable) = encodeJson serializable
-
-instance (EncodeJson a, DecodeJson a) => Body (JsonBody a) where
-  defaultHeaders = pure $ pure $ 
-    Headers <<< fromFoldable $ [
-      Tuple (CaseInsensitiveString "content-type") "application/json"
-    ]
-  write result resp =
-    let
-      bodyAsString = stringify <<< encodeJson $ result
-    in
-      write bodyAsString resp
 
 -- models for airtable response like:
 -- |
@@ -246,10 +230,6 @@ derive instance genericResult :: Generic Result _
 
 instance showResult :: Show Result where
   show = genericShow
-
-instance Body Result where
-  defaultHeaders result = defaultHeaders (JsonBody result)
-  write result resp = write (JsonBody result) resp 
 
 newtype Results = Results (Array Result)
 

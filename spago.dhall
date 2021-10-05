@@ -29,19 +29,16 @@ to generate this file without the comments in this block.
   , "formatters"
   , "functions"
   , "halogen"
-  , "httpure"
   , "lists"
   , "maybe"
   , "newtype"
   , "node-process"
-  , "ordered-collections"
   , "partial"
   , "prelude"
   , "psci-support"
   , "spec"
   , "spec-discovery"
   , "strings"
-  , "tuples"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
