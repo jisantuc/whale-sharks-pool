@@ -13,6 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "plotly": "^1.0.6"
+    "plotly": "^1.0.6",
+    "purty": "^7.0.0",
+    "xhr2": "^0.2.1"
   }
 }

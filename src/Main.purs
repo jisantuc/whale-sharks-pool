@@ -1,10 +1,19 @@
 module Main where
 
 import Prelude
-import Client (fetchResults)
+import Affjax (Error)
+import AirtableClient (fetchResults)
+import Control.Promise (Promise, fromAff)
+import Data.Either (Either)
+import Data.Maybe (Maybe)
+import Data.Traversable (traverse)
+import Dotenv (loadFile)
 import Effect (Effect)
-import Effect.Aff (launchAff_)
+import Effect.Aff (Aff, launchAff_)
+import Effect.Class (liftEffect)
 import Effect.Class.Console (log, logShow)
+import Effect.Uncurried (EffectFn2, mkEffectFn2)
+import Node.Process (lookupEnv)
 
 -- what's this app do?
 -- - fetch data from Airtable
@@ -16,7 +25,15 @@ import Effect.Class.Console (log, logShow)
 -- - put it all on S3
 main :: Effect Unit
 main = do
-  launchAff_
-    $ do
-        responses <- fetchResults "bogusKey"
-        logShow responses
+  launchAff_ mainAff
+
+handler :: forall a b. EffectFn2 a b (Promise (Maybe (Either Error Unit)))
+handler = mkEffectFn2 $ \_ _ -> fromAff mainAff
+
+mainAff :: Aff (Maybe (Either Error Unit))
+mainAff = do
+  _ <- loadFile
+  log "File loaded"
+  apiToken <- liftEffect $ lookupEnv "AIRTABLE_KEY"
+  void $ traverse (const $ log "Key looked up") apiToken
+  traverse (\token -> fetchResults token >>= traverse logShow) apiToken
