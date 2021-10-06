@@ -21,13 +21,6 @@ import Partial.Unsafe (unsafePartial)
 import Plotly (XYData)
 import Prelude (class Show, bind, pure, show, ($), (<$>), (<<<), (<>), (>>=))
 
-newtype JsonBody a = JsonBody a
-
-derive instance Newtype (JsonBody a) _
-
-instance EncodeJson a => EncodeJson (JsonBody a) where
-  encodeJson (JsonBody serializable) = encodeJson serializable
-
 -- models for airtable response like:
 -- |
 -- {
