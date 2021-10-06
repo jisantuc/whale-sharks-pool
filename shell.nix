@@ -5,5 +5,6 @@ with import <nixpkgs> {};
 	  name = "whale-sharks-pool";
 	  buildInputs = [ pkgs.spago
                           pkgs.purescript
-                          pkgs.nodejs-14_x ];
+                          pkgs.nodejs-14_x
+                          pkgs.terraform_1_0_0 ];
 }
