@@ -71,13 +71,13 @@ jobs:
       - name: Put AIRTABLE_KEY in tf vars file
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          echo "airtable_key = \"${{ secrets.AIRTABLE_KEY }}\"" > deployment/variables.tf
+          echo "airtable_key = \"${{ secrets.AIRTABLE_KEY }}\"" > deployment/tfvars
 
       - name: Deploy API
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           pushd deployment && \
-            terraform plan -var-file=variables.tf -out tfplan.out && \
+            terraform plan -var-file=tfvars -out tfplan.out && \
             terraform apply -auto-approve tfplan.out
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
