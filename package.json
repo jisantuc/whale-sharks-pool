@@ -1,20 +1,29 @@
 {
+  "files": "dist",
   "name": "whale-sharks-pool",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "npx purty --write src"
+    "format": "npx purty --write src-ps"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "plotly": "^1.0.6",
-    "purty": "^7.0.0",
+    "process": "^0.11.10",
     "xhr2": "^0.2.1"
+  },
+  "devDependencies": {},
+  "source": "src-js/index.js",
+  "main": "dist/index.js",
+  "targets": {
+    "main": {
+      "outputFormat": "commonjs",
+      "isLibrary": true
+    }
   }
 }

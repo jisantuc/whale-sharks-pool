@@ -21,11 +21,12 @@ to generate this file without the comments in this block.
   , "bifunctors"
   , "console"
   , "datetime"
-  , "dotenv"
   , "effect"
   , "either"
   , "enums"
+  , "exceptions"
   , "foldable-traversable"
+  , "foreign-object"
   , "formatters"
   , "functions"
   , "halogen"
@@ -41,5 +42,5 @@ to generate this file without the comments in this block.
   , "strings"
   ]
 , packages = ./packages.dhall
-, sources = [ "src/**/*.purs", "test/**/*.purs" ]
+, sources = [ "src-ps/**/*.purs", "test/**/*.purs" ]
 }
