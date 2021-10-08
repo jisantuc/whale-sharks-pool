@@ -2,7 +2,7 @@ module Model where
 
 import Data.Argonaut.Core (Json, fromString, toObject, toString)
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..), decodeJson, (.:))
-import Data.Argonaut.Encode (class EncodeJson, encodeJson)
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Bifunctor (lmap)
 import Data.Date (Date, day, month, year)
