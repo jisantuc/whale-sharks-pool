@@ -56,12 +56,11 @@ jobs:
         run: spago test --no-install
 
       - name: Bundle lambda function js code
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: spago bundle-module -m Main -t dist/index.js
+        run: spago bundle-module -m Lambda -t index.js
 
       - name: Create Lambda deployment package
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: zip -r9 dist/package.zip dist/index.js
+        run: zip -r9 dist/package.zip index.js ./node_modules
 
       - name: Setup terraform
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -80,3 +79,6 @@ jobs:
           pushd deployment && \
             terraform plan -var-file=variables.tf -out tfplan.out && \
             terraform apply -auto-approve tfplan.out
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

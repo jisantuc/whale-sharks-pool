@@ -5,7 +5,7 @@ resource "aws_lambda_function" "whale_sharks_api" {
   description      = "Whale sharks API"
   role             = resource.aws_iam_role.whale_sharks_api_role.arn
   runtime          = "nodejs14.x"
-  handler          = "dist/index.handler"
+  handler          = "index.handler"
   timeout          = 10
   memory_size      = 128
 
