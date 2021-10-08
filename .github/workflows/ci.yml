@@ -60,7 +60,7 @@ jobs:
 
       - name: Create Lambda deployment package
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: zip -r9 dist/package.zip index.js ./node_modules
+        run: mkdir -p dist && zip -r9 dist/package.zip index.js ./node_modules
 
       - name: Setup terraform
         if: ${{ github.ref == 'refs/heads/main' }}
