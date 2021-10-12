@@ -29,7 +29,6 @@ to generate this file without the comments in this block.
   , "foreign-object"
   , "formatters"
   , "functions"
-  , "halogen"
   , "lists"
   , "maybe"
   , "newtype"
