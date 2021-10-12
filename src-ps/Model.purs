@@ -18,7 +18,6 @@ import Data.Show.Generic (genericShow)
 import Data.String.NonEmpty (NonEmptyString)
 import Data.Traversable (traverse)
 import Partial.Unsafe (unsafePartial)
-import Plotly (XYData)
 import Prelude (class Show, bind, pure, show, ($), (<$>), (<<<), (<>), (>>=))
 
 -- models for airtable response like:
@@ -239,14 +238,3 @@ instance DecodeJson Results where
       resultSet <- traverse decodeJson records
       pure $ Results resultSet
     Nothing -> Left $ UnexpectedValue js
-
-toXYData :: Array Result -> XYData String
-toXYData results =
-  let
-    xs :: Array String
-    xs = (\(Result { date }) -> jsonDateToString date) <$> results
-
-    ys :: Array Int
-    ys = (\(Result { points }) -> points) <$> results
-  in
-    { x: xs, y: ys }

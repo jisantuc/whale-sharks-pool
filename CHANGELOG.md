@@ -7,3 +7,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Created (very simple) Lambda + API Gateway deployment for API [#4](https://github.com/jisantuc/whale-sharks-pool/pull/4)
+- Created frontend skeleton and scripts [#7](https://github.com/jisantuc/whale-sharks-pool/pull/7)
