@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "npx purty --write src-ps",
     "dev": "npx parcel index.html",
-    "build-frontend": "spago build && npx parcel@2.0.0 build index.html --dist-dir=public --public-url=./"
+    "build-frontend": "spago build && npx parcel@2.0.0 build --dist-dir=public --public-url=./ --target=frontend"
   },
   "author": "",
   "license": "ISC",
@@ -18,5 +18,11 @@
     "process": "^0.11.10",
     "xhr2": "^0.2.1"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "targets": {
+    "frontend": {
+      "source": "index.html",
+      "context": "browser"
+    }
+  }
 }
