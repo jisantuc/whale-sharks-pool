@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "npx purty --write src-ps",
     "dev": "npx parcel index.html",
-    "build-frontend": "spago build && npx parcel@2.0.0 build index.html --dist-dir=public --public-url=whale-sharks-pool/"
+    "build-frontend": "spago build && npx parcel@2.0.0 build index.html --dist-dir=public --public-url=./"
   },
   "author": "",
   "license": "ISC",
