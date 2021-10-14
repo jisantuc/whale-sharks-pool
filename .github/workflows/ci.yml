@@ -56,11 +56,11 @@ jobs:
         run: spago test --no-install
 
       - name: Bundle lambda function js code
-        run: spago bundle-module -m Lambda -t index.js
+        run: spago bundle-module -m Lambda -t index.backend.js
 
       - name: Create Lambda deployment package
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: mkdir -p dist && zip -r9 dist/package.zip index.js ./node_modules
+        run: mkdir -p dist && zip -r9 dist/package.zip index.backend.js ./node_modules
 
       - name: Setup terraform
         if: ${{ github.ref == 'refs/heads/main' }}
