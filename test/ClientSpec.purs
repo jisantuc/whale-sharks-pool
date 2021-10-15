@@ -5,7 +5,7 @@ import Prelude
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (JsonDecodeError, decodeJson, parseJson)
 import Data.Either (Either, isRight)
-import Model (RawResults, Results)
+import Model (RawResults)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldSatisfy)
 

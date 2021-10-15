@@ -9,7 +9,7 @@ import Data.Bifunctor (lmap)
 import Data.Date (Date, day, month, year)
 import Data.DateTime (DateTime(..), Hour, Millisecond, Minute, Second, Time(..), date)
 import Data.Either (Either(..), note)
-import Data.Enum (toEnum)
+import Data.Enum (fromEnum, toEnum)
 import Data.Formatter.DateTime (Formatter, FormatterCommand(..), format, unformat)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..), (:))
@@ -19,7 +19,7 @@ import Data.Show.Generic (genericShow)
 import Data.String.NonEmpty (NonEmptyString)
 import Data.Traversable (traverse)
 import Partial.Unsafe (unsafePartial)
-import Prelude (class Show, bind, pure, show, ($), (<$>), (<<<), (<>), (>>=))
+import Prelude (class Eq, class Ord, class Show, bind, pure, show, ($), (<$>), (<<<), (<>), (>>=))
 
 -- models for airtable response like:
 -- |
@@ -63,6 +63,8 @@ instance showWinLoss :: Show WinLoss where
 data Game
   = EightBall
   | NineBall
+
+derive instance Eq Game
 
 instance decodeGame :: DecodeJson Game where
   decodeJson js =
@@ -140,6 +142,10 @@ newtype JsonDate
 
 derive newtype instance showJsonDate :: Show JsonDate
 
+derive newtype instance Eq JsonDate
+
+derive newtype instance Ord JsonDate
+
 dateFormat :: Formatter
 dateFormat =
   YearFull
@@ -155,11 +161,11 @@ jsonDateFromString s = (JsonDate <<< date <$> unformat dateFormat s)
 jsonDateToString :: JsonDate -> String
 jsonDateToString (JsonDate dt) =
   let
-    y = year dt
+    y = fromEnum $ year dt
 
     m = month dt
 
-    d = day dt
+    d = fromEnum $ day dt
   in
     show y <> "-" <> show m <> "-" <> show d
 

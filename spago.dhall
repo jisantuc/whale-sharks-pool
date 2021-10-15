@@ -18,6 +18,7 @@ to generate this file without the comments in this block.
   , "argonaut-codecs"
   , "argonaut-core"
   , "argonaut-generic"
+  , "arrays"
   , "bifunctors"
   , "console"
   , "datetime"
@@ -39,6 +40,7 @@ to generate this file without the comments in this block.
   , "spec"
   , "spec-discovery"
   , "strings"
+  , "tuples"
   ]
 , packages = ./packages.dhall
 , sources = [ "src-ps/**/*.purs", "test/**/*.purs" ]
