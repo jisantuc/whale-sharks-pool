@@ -3,25 +3,26 @@ module Lambda (handler) where
 import Prelude
 
 import Affjax (printError)
-import AirtableClient (fetchResults)
+import AirtableClient (recentResults)
 import Control.Promise (Promise, fromAff)
 import Data.Argonaut.Core (Json, stringify)
 import Data.Argonaut.Encode (encodeJson)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Traversable (traverse)
+import Data.Tuple (Tuple(..))
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFn2, mkEffectFn2)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (error, log)
 import Effect.Exception (throw)
 import Foreign.Object as Object
-import Model (Results)
+import Model (RawResults)
 import Node.Process (lookupEnv)
 
-unsafeFetchResults :: String -> Aff Results
+unsafeFetchResults :: String -> Aff RawResults
 unsafeFetchResults token =
-  fetchResults token
+  recentResults token
     >>= case _ of
         Right results -> pure results
         Left e -> error (printError e) *> liftEffect (throw "failed to fetch results")
@@ -37,7 +38,7 @@ mainAff = do
           encodeJson
             { isBase64Encoded: true
             , statusCode: 200
-            , headers: Object.empty :: Object.Object String
+            , headers: Object.fromFoldable [ Tuple "Access-Control-Allow-Origin" "*" ]
             , body: stringify <<< encodeJson $ results
             }
       in

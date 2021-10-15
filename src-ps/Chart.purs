@@ -1,13 +1,27 @@
-module Chart (linePlot', register) where
+module Chart (linePlot', register, defaultDataset, Dataset) where
 
 import Prelude
-
-import Data.Function.Uncurried (Fn4, runFn4)
+import Data.Function.Uncurried (Fn3, runFn3)
 import Effect (Effect)
 
 foreign import register :: Effect Unit
 
-foreign import linePlot :: forall a. Fn4 String String a (Array Int) (Effect Unit)
+foreign import linePlot :: forall a. Fn3 String a (Array Dataset) (Effect Unit)
 
-linePlot' :: forall a. String -> String -> a -> Array Int -> Effect Unit
-linePlot' = runFn4 linePlot
+linePlot' :: forall a. String -> a -> Array Dataset -> Effect Unit
+linePlot' = runFn3 linePlot
+
+type Dataset
+  = { label :: String
+    , data :: Array Int
+    , backgroundColor :: Array String
+    , borderWidth :: Int
+    }
+
+defaultDataset :: Dataset
+defaultDataset =
+  { label: "no-data"
+  , data: []
+  , backgroundColor: [ "rgba(255, 99, 132, 0.2)" ]
+  , borderWidth: 1
+  }
