@@ -5,20 +5,19 @@ import Affjax (Error(..), printError)
 import Affjax as AX
 import Affjax.RequestHeader (RequestHeader(..))
 import Affjax.ResponseFormat as ResponseFormat
-import Data.Argonaut.Core (Json, stringify)
+import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError, decodeJson, printJsonDecodeError)
 import Data.Bifunctor (lmap)
 import Data.Date (Date)
 import Data.DateTime (date)
 import Data.Either (Either(..))
 import Data.Formatter.DateTime (unformat)
-import Data.String.NonEmpty (unsafeFromString)
 import Effect.Aff (Aff)
-import Model (Game(..), JsonDate(..), Order(..), Result(..), Results, Session(..), WinLoss(..), dateFormat)
+import Model (RawResults, dateFormat)
 import Partial.Unsafe (unsafePartial)
 
-showResult :: forall r. Either Error { body :: Json | r } -> String
-showResult (Right v) = stringify v.body
+showResult :: forall a. Show a => Either Error a -> String
+showResult (Right v) = show v
 
 showResult (Left e) = printError e
 
@@ -51,33 +50,7 @@ getDate (Right d) = d
 exampleDate :: Date
 exampleDate = unsafePartial $ getDate $ date <$> unformat dateFormat "2021-08-27"
 
-mockResults :: Array Result
-mockResults =
-  [ Result
-      { date: JsonDate exampleDate
-      , name: unsafePartial $ unsafeFromString "Jones"
-      , opponentSkill: 4
-      , session: Fall2021
-      , seasonWeek: 1
-      , order: Three
-      , points: 1
-      , winLoss: Loss
-      , game: NineBall
-      }
-  , Result
-      { date: JsonDate exampleDate
-      , name: unsafePartial $ unsafeFromString "Jones"
-      , opponentSkill: 3
-      , session: Fall2021
-      , seasonWeek: 2
-      , order: Two
-      , points: 3
-      , winLoss: Win
-      , game: NineBall
-      }
-  ]
-
-fetchResults :: String -> Aff (Either Error Results)
+fetchResults :: String -> Aff (Either Error RawResults)
 fetchResults token =
   let
     baseUrl = "https://api.airtable.com/v0/app9IJg37UKNWeN8g/Results"

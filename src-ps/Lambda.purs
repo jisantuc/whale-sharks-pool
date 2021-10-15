@@ -1,7 +1,6 @@
 module Lambda (handler) where
 
 import Prelude
-
 import Affjax (printError)
 import AirtableClient (fetchResults)
 import Control.Promise (Promise, fromAff)
@@ -16,10 +15,10 @@ import Effect.Class (liftEffect)
 import Effect.Class.Console (error, log)
 import Effect.Exception (throw)
 import Foreign.Object as Object
-import Model (Results)
+import Model (RawResults, Results)
 import Node.Process (lookupEnv)
 
-unsafeFetchResults :: String -> Aff Results
+unsafeFetchResults :: String -> Aff RawResults
 unsafeFetchResults token =
   fetchResults token
     >>= case _ of

@@ -2,6 +2,7 @@ module Model where
 
 import Data.Argonaut.Core (Json, fromString, toObject, toString)
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..), decodeJson, (.:))
+import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Bifunctor (lmap)
@@ -199,7 +200,9 @@ data Result
     , session :: Session
     }
 
-instance decodeResult :: DecodeJson Result where
+newtype RawResult = RawResult Result
+
+instance DecodeJson RawResult where
   decodeJson js = case (toObject js) of
     Just obj -> do
       fields <- obj .: "fields"
@@ -212,15 +215,22 @@ instance decodeResult :: DecodeJson Result where
       winLoss <- fields .: "WinLoss"
       game <- fields .: "Game"
       seasonWeek <- fields .: "Season Week"
-      pure $ Result { date, game, name, opponentSkill, order, points, seasonWeek, winLoss, session }
+      pure $ RawResult $ Result { date, game, name, opponentSkill, order, points, seasonWeek, winLoss, session }
     Nothing -> Left $ UnexpectedValue js
+
+derive newtype instance Show RawResult
+
+derive newtype instance EncodeJson RawResult
+
+instance DecodeJson Result where
+  decodeJson = genericDecodeJson
 
 instance EncodeJson Result where
   encodeJson = genericEncodeJson
 
 derive instance genericResult :: Generic Result _
 
-instance showResult :: Show Result where
+instance Show Result where
   show = genericShow
 
 newtype Results = Results (Array Result)
@@ -231,10 +241,18 @@ derive newtype instance Show Results
 
 derive newtype instance EncodeJson Results
 
-instance DecodeJson Results where
+derive newtype instance DecodeJson Results
+
+newtype RawResults = RawResults (Array RawResult)
+
+derive newtype instance Show RawResults
+
+derive newtype instance EncodeJson RawResults
+
+instance DecodeJson RawResults where
   decodeJson js = case toObject js of
     Just obj -> do
       records :: Array Json <- obj .: "records"
       resultSet <- traverse decodeJson records
-      pure $ Results resultSet
+      pure $ RawResults resultSet
     Nothing -> Left $ UnexpectedValue js
