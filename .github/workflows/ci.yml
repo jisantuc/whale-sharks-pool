@@ -56,11 +56,11 @@ jobs:
         run: spago test --no-install
 
       - name: Bundle lambda function js code
-        run: spago bundle-module -m Lambda -t index.js
+        run: spago bundle-module -m Lambda -t index.backend.js
 
       - name: Create Lambda deployment package
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: mkdir -p dist && zip -r9 dist/package.zip index.js ./node_modules
+        run: mkdir -p dist && zip -r9 dist/package.zip indexBE.js ./node_modules
 
       - name: Setup terraform
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -83,3 +83,15 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Build frontend for gh-pages deploy
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          npm run build-frontend
+
+      - name: Push to gh-pages
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages
+          folder: public
