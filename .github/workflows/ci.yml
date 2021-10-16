@@ -56,7 +56,7 @@ jobs:
         run: spago test --no-install
 
       - name: Bundle lambda function js code
-        run: spago bundle-module -m Lambda -t index.backend.js
+        run: spago bundle-module -m Lambda -t indexBE.js
 
       - name: Create Lambda deployment package
         if: ${{ github.ref == 'refs/heads/main' }}
